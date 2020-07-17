@@ -2,6 +2,8 @@
 A Steganography program to deecode LSB or MSB on images
 May be useful on your CTF. Feel free to help :)
 
+( This program use Python3 )
+
 ## Requirements
 This program requires the lib Pillow, which can be installed as follows
 ```
