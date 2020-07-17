@@ -1,4 +1,4 @@
-# sbPy
+#                       sbPy
 A Steganography program to deecode LSB or MSB on images
 May be useful on your CTF. Feel free to help :)
 
