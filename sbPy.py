@@ -21,10 +21,6 @@ def writeResults(outputFile, dataBin):
 
 def getSB(file, ord, type, outFile, ext):
     dataBin = []
-    print(ord)
-    print(type)
-    print(outFile)
-    print(ext)
     if type == "LSB":
         with Image.open(file) as img:
             width, height = img.size
