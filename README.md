@@ -5,11 +5,11 @@ May be useful on your CTF. Feel free to help :)
 ## Requirements
 This program requires the lib Pillow, which can be installed as follows
 ```
-pip3 install Pillow
+            pip3 install Pillow
 ```
 ## How to use it?
    ### Usage
-          `python3 sbPy.py [OPTIONS] [FILE]`
+          python3 sbPy.py [OPTIONS] [FILE]
    ### Options
    
    Parameters Option | Functionality
