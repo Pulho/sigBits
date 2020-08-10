@@ -22,7 +22,7 @@ This program requires the lib Pillow, which can be installed as follows
    -out=<Ouput name>, --output=<Output name> | Choose the name of the output file (Default is outputSB)
    -e=<Row r Column>, --extract=<Row or Column> | Choose between extracting by row or column (Default is Column
   ### Examples
-  ```python
+  ```
     
     python3 sbPy.py -t=lsb -o=rgb -out=MyOutputFile -e=row MyInputFile.png
     python3 sbPy.py -t=LSB -o=BGR -e=column lol.jpg
