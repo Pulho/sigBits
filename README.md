@@ -1,5 +1,5 @@
 #                       sbPy
-A Steganography program to deecode LSB or MSB on images
+A Steganography program to decode LSB or MSB on images
 May be useful on your CTF. Feel free to help :)
 
 ( This program use Python3 )
