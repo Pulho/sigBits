@@ -8,7 +8,7 @@ This program requires the lib Pillow, which can be installed as follows
 ```
             pip install Pillow
 ```
-## How to use it?
+## How to use it
    ### Usage
           python sigBits.py [OPTIONS] [FILE]
    ### Options
