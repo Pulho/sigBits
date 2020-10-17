@@ -1,6 +1,6 @@
 #                       sigBits
 A Steganography significant bits image decoder
-May be useful in some CTF. Feel free to help :)
+may be useful in some CTF. Feel free to help :)
 ( This program use Python3 )
 
 ## Requirements
