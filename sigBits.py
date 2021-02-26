@@ -87,6 +87,11 @@ def checkParameters(file, parameters):
     bitsSelection = None
 
     size = len(parameters)
+
+    if file.find(".") == -1:
+        print(f"INPUT ERROR: Unrecognized file type for '{file}'")
+        exit()
+
     for i in range(size):
         # Help
         if parameters[i] == "--help" or parameters[i] == "-h":
