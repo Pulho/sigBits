@@ -24,8 +24,8 @@ This program requires the lib Pillow, which can be installed as follows
   ### Examples
   ```
     
-    python sbPy.py -t=lsb -o=rgb -out=MyOutputFile -e=row MyInputFile.png
-    python sbPy.py -t=LSB -o=BGR -e=column SomeImage.jpg
-    python sbPy.py --type=Msb --order=GBR --extract=CoLuMn AnotherImage.png
+    python sigBits.py -t=lsb -o=rgb -out=MyOutputFile -e=row MyInputFile.png
+    python sigBits.py -t=LSB -o=BGR -e=column SomeImage.jpg
+    python sigBits.py --type=Msb --order=GBR --extract=CoLuMn AnotherImage.png
   ```
   __Note that the input of each options are not case-sensitive, that means you can write with Caps Lock or not__
