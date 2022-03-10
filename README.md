@@ -20,7 +20,7 @@ This program requires the lib Pillow, which can be installed as follows
    -o=<Order sigle>, --order=<Order sigle> | Read the lsb or msb in the specify order (Default is RGB) 
    -out=<Ouput name>, --output=<Output name> | Choose the name of the output file (Default is outputSB)
    -e=<Row or Column>, --extract=<Row or Column> | Choose between extracting by row or column (Default is Column)
-   -b=<8 Bits>, --bits=<8 Bits> | Choose the bits you want to extract info ( Have higher priority than '--type or -t' )
+   -b=<8 Bits>, --bits=<8 Bits> | Choose the bits you want to extract info (Have higher priority than '--type or -t')
   ### Examples
   ```
     
