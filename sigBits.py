@@ -1,15 +1,21 @@
-import os
-import binascii
-import sys
+import argparse
 from PIL import Image
 
-def help(func=None):
-    if func == None:
-        print("Usage:\n\tsbPy [OPTIONS] [FILE]")
-        print("\nOptions:\n\t-t=<lsb or msb>, --type=<lsb or msb>:\n\t\tChoose between read LSB or MSB (Default is LSB)\n\n\t-o=<Order sigle>, --order=<Order sigle>:\n\t\tRead the lsb or msb in the specify order (Default is RGB)\n\n\t-out=<Ouput name>, --output=<Output name>\n\t\tChoose the name of the output file (Default is outputSB)\n\n\t-e=<Row r Column>, --extract=<Row or Column>\n\t\tChoose between extracting by row or column (Default is Column)\n\n\t-b=<7 bits of your choice>, --bits=<7 bits of your choice>\n\t\tChoose the bits you want to extract info ( Have higher priority than '--type or -t' )")
-    return
+def setupArgparser():
+    parser = argparse.ArgumentParser(
+        prog='SigBits',
+        description='A Steganography significant bits image decoder'
+    )
+    parser.add_argument('-i', '--input', type=str.lower, help='Specifies the input file that the program will analyze', required=True)
+    parser.add_argument('-t', '--type', type=str.lower, help='Choose between read LSB or MSB (Default is LSB)', default='lsb', choices=['lsb', 'msb'], required=False)
+    parser.add_argument('-o', '--order', type=str.lower, help='Read the LSB/MSB in the specify order (Default is RGB)', default='rgb', choices=['rgb', 'rbg', 'grb', 'gbr', 'brg', 'bgr'], required=False)
+    parser.add_argument('-out', '--output', type=str, help='Choose the name of the output file', required=True)
+    parser.add_argument('-bf', '--bruteforce', type=bool, help='Bruteforce all possible permutations of the R, G, and B channel', required=False)
+    parser.add_argument('-e', '--extract', type=str.lower, help='Choose between extracting by row or column (Default is Column)', default='column', choices=['column', 'row'], required=False)
+    parser.add_argument('-b', '--bits', type=str.lower, help='Choose the bits you want to extract information from. If this option is provided, the --type (-t) parameter will be ignored', required=False) # Rever
+    return parser
 
-def extractBin(strInput, bits):
+def extract_binary(strInput: str, bits: str):
     strInput = strInput[2:]
     outputList = []
 
@@ -21,8 +27,9 @@ def extractBin(strInput, bits):
             outputList.append(strInput[i])
     return outputList
 
-def writeResults(outputFile, dataBin):
-    resultFile = open(outputFile + ".txt", "w")
+def write_output_file(outputFile: str, dataBin: list):
+    resultFile = open(outputFile, "w")
+    
     size = len(dataBin)
     for i in range(0,size,8):
         # Each 8 bits convert into a int value
@@ -33,144 +40,72 @@ def writeResults(outputFile, dataBin):
     resultFile.write("\n")
     resultFile.close()
 
-def getSB(file, ord, outFile, ext, bits):
+def get_significant_bits(input: str, order: str, output: str, bruteforce: bool, extract: str, bits: str):
     dataBin = []
-    with Image.open(file) as img:
+    with Image.open(input) as img:
         width, height = img.size
         xPattern = height
         yPattern = width
-        if ext == "ROW":
+        
+        if extract == "row":
             xPattern = width
             yPattern = height
-        for x in range(0, xPattern):
-            for y in range(0, yPattern):
-                if ext == "ROW":
-                    pixel = list(img.getpixel((x,y)))
-                else:
-                    pixel = list(img.getpixel((y,x)))
-
-                R = extractBin(bin(pixel[0]), bits)
-                G = extractBin(bin(pixel[1]), bits)
-                B = extractBin(bin(pixel[2]), bits)
-                if ord == "RGB":
-                    dataBin.extend(R)
-                    dataBin.extend(G)
-                    dataBin.extend(B)
-                elif ord == "RBG":
-                    dataBin.extend(R)
-                    dataBin.extend(B)
-                    dataBin.extend(G)
-                elif ord == "GRB":
-                    dataBin.extend(G)
-                    dataBin.extend(R)
-                    dataBin.extend(B)
-                elif ord == "GBR":
-                    dataBin.extend(G)
-                    dataBin.extend(B)
-                    dataBin.extend(R)
-                elif ord == "BRG":
-                    dataBin.extend(B)
-                    dataBin.extend(R)
-                    dataBin.extend(G)
-                else:
-                    dataBin.extend(B)
-                    dataBin.extend(G)
-                    dataBin.extend(R)
-    writeResults(outFile, dataBin)
-    print("Done, check the output file!")
-
-def checkParameters(file, parameters):
-    order = 'RGB' # Default
-    sbType = 'LSB' # Default
-    outputFile = "outputSB" # Default
-    extract = "COLUMN" # Default
-    bitsSelection = None
-
-    size = len(parameters)
-
-    if file.find(".") == -1:
-        print(f"INPUT ERROR: Unrecognized file type for '{file}'")
-        exit()
-
-    for i in range(size):
-        # Help
-        if parameters[i] == "--help" or parameters[i] == "-h":
-            help()
-            exit()
-        # Order
-        elif parameters[i][:3] == "-o=":
-            order = parameters[i][3:].upper()
-            if len(order) > 3:
-                print(f"INPUT ERROR: Parameter '{order}' Exceeds parameter size ( Expected length = 3 )")
-                exit()
-            if order.find("R") == -1 or order.find("G") == -1 or order.find("B") == -1:
-                print(order.find("R"), order.find("G"), order.find("B"))
-                print(f"INPUT ERROR: Parameter '{order}' Has different characters than 'R,G,B' or repetitive character")
-                exit()
-        elif parameters[i][:8] == "--order=":
-            order = parameters[i][3:].upper()
-            if len(order) > 3:
-                print(f"INPUT ERROR: Parameter '{order}' Exceeds parameter size ( Expected length = 3 )")
-                exit()
-            if order.find("R") == -1 or order.find("G") == -1 or order.find("B") == -1:
-                print(f"INPUT ERROR: Parameter '{order}' Has different characters than 'R,G,B' or repetitive character")
-                exit()
-        # Type
-        elif parameters[i][:3] == "-t=":
-            sbType = parameters[i][3:].upper()
-            if sbType != "LSB" and sbType != "MSB":
-                print(f"INPUT ERROR: Type '{sbType}' Not recognized")
-                exit()
-        elif parameters[i][:7] == "--type=":
-            sbType = parameters[i][7:].upper()
-            if sbType != "LSB" and sbType != "MSB":
-                print(f"INPUT ERROR: Type '{sbType}' Not recognized")
-                exit()
-        # Output file name
-        elif parameters[i][:5] == "-out=":
-            outputFile = parameters[i][5:]
-        elif parameters[i][:9] == "--output=":
-            outputFile = parameters[i][9:]
-        # Bit selection
-        elif parameters[i][:3] == "-b=":
-            bitsSelection = parameters[i][3:]
-            if len(bitsSelection) != 8:
-                print(f"INPUT ERROR: Parameter 'bits' Expected 8 bits")
-                exit()
-            if int(bitsSelection, 2) == 0:
-                print(f"INPUT ERROR: Parameter 'bits' Expected to have at least, one selected bit")
-                exit()
-        elif parameters[i][:7] == "--bits=":
-            bitsSelection = parameters[i][7:]
-            if len(bitsSelection) != 8:
-                print(f"INPUT ERROR: Parameter 'bits' Expected 8 bits")
-                exit()
-            if int(bitsSelection, 2) == 0:
-                print(f"INPUT ERROR: Parameter 'bits' Expected to have at least, one selected bit")
-                exit()
-        # Row or Column
-        elif parameters[i][:3] == "-e=":
-            extract = parameters[i][3:].upper()
-        elif parameters[i][:10] == "--extract=":
-            extract = parameters[i][10:].upper()
+        
+        if bruteforce:
+            for bruteforceOrder in ['rgb', 'rbg', 'grb', 'gbr', 'brg', 'bgr']:
+                get_significant_bits(input=input, order=bruteforceOrder, output=bruteforceOrder.upper() + output, bruteforce=False, extract=extract, bits=bits)
         else:
-            print(f"INPUT ERROR: Parameter '{parameters[i]}' Not recognized")
-            exit()
-    # Set bitsSelection in the event that it has not been sent as a parameter 
-    if not bitsSelection:
-        if sbType == "LSB":
-            bitsSelection = "00000001"
-        elif sbType == "MSB":
-            bitsSelection = "10000000"
-    getSB(file, ord=order, outFile=outputFile, ext=extract, bits = bitsSelection)
+            for x in range(0, xPattern):
+                for y in range(0, yPattern):
+                    if extract == "row":
+                        pixel = list(img.getpixel((x,y)))
+                    else:
+                        pixel = list(img.getpixel((y,x)))
 
-def main(): # Adjustments for parameters
-    if len(sys.argv) < 2:
-        help()
-        return
-    elif len(sys.argv) == 2 and ( sys.argv[1] == '--help' or sys.argv[1] == '-h'):
-        help()
-        return
-    checkParameters(sys.argv[-1:][0], sys.argv[1:-1])
-main()
+                    R = extract_binary(bin(pixel[0]), bits)
+                    G = extract_binary(bin(pixel[1]), bits)
+                    B = extract_binary(bin(pixel[2]), bits)
+                    
+                    if order == "rgb":
+                        dataBin.extend(R)
+                        dataBin.extend(G)
+                        dataBin.extend(B)
+                    elif order == "rbg":
+                        dataBin.extend(R)
+                        dataBin.extend(B)
+                        dataBin.extend(G)
+                    elif order == "grb":
+                        dataBin.extend(G)
+                        dataBin.extend(R)
+                        dataBin.extend(B)
+                    elif order == "gbr":
+                        dataBin.extend(G)
+                        dataBin.extend(B)
+                        dataBin.extend(R)
+                    elif order == "brg":
+                        dataBin.extend(B)
+                        dataBin.extend(R)
+                        dataBin.extend(G)
+                    else:
+                        dataBin.extend(B)
+                        dataBin.extend(G)
+                        dataBin.extend(R)        
+            write_output_file(outputFile=output, dataBin=dataBin)
+    
+def main():
+    parser = setupArgparser()
+    args = parser.parse_args()
+    
+    if not args.bits:
+        if args.type == 'lsb':
+            args.bits = "00000001"
+        else:
+            args.bits= "10000000"
+            
+    get_significant_bits(input=args.input, order=args.order, output=args.output, bruteforce=args.bruteforce, extract=args.extract, bits=args.bits)
+    print("Done, check the output file(s)!")
+
+
+if __name__ == '__main__':
+    main()
 
